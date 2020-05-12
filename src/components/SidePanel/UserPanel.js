@@ -30,7 +30,7 @@ let UserPanel = (props) => {
 
         <Header style={{ padding: "0.25em" }} as="h4" inverted>
           <Dropdown
-            text={
+            trigger={
               <span>
                 <Image src={photoURL} spaced="right" avatar />
                 {displayName}
