@@ -68,9 +68,7 @@ let Register = ({ history }) => {
           createdUser.user
             .updateProfile({
               displayName: username,
-              photoURL: `http://gravatar.com/avatar/${md5(
-                userEmail
-              )}?d=identicon`,
+              photoURL: `https://robohash.org/${md5(userEmail)}?set=set4`,
             })
             .then(() => {
               saveUser(createdUser).then(() => {

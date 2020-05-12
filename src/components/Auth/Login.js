@@ -14,14 +14,13 @@ import { Form, Input } from "semantic-ui-react-form-validator";
 import { Link, withRouter } from "react-router-dom";
 import styled from "styled-components";
 
-let Login = ({ history }) => {
+let Login = () => {
   const [inputState, setInputState] = useState({
     email: "",
     password: "",
   });
 
   const [fieldError, setFieldError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { email, password } = inputState;
@@ -92,9 +91,7 @@ let Login = ({ history }) => {
                 {loading && <Loader active inline size="small" />}
               </Button>
             </Segment>
-            {successMessage && (
-              <div className="ui positive message">{successMessage}</div>
-            )}
+
             {fieldError && (
               <div className="ui negative message">{fieldError}</div>
             )}

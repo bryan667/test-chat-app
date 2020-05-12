@@ -1,6 +1,6 @@
 import React, { useEffect, Fragment } from "react";
 import ReactDOM from "react-dom";
-import { get } from "lodash";
+import { get, isEmpty } from "lodash";
 import App from "./components/App";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
@@ -24,15 +24,18 @@ import * as userActions from "./redux/user/actions";
 const { store, persistor } = getStore();
 
 let Root = (props) => {
-  const { history, setUser, isLoading } = props;
+  const { history, setUser, clearUser, isLoading } = props;
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
-      console.log("hey", user);
-
       if (user) {
         setUser(user);
         history.push("/");
+      } else if (isEmpty(user) && window.location.pathname === "/") {
+        history.push("/login");
+        clearUser();
+      } else {
+        clearUser();
       }
     });
     //eslint-disable-next-line
@@ -53,12 +56,13 @@ let Root = (props) => {
   );
 };
 
-const mapStateFromProps = (state) => ({
-  isLoading: get(state, "user.isLoading"),
-});
-
 Root = withRouter(Root);
-Root = connect(mapStateFromProps, userActions)(Root);
+Root = connect(
+  (state) => ({
+    isLoading: get(state, "user.isLoading"),
+  }),
+  userActions
+)(Root);
 
 ReactDOM.render(
   <Provider store={store}>
