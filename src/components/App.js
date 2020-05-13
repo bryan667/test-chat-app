@@ -36,4 +36,23 @@ const Wrapper = styled.div`
   .ui.grid {
     margin: 0rem;
   }
+
+  .side-menu {
+    background: #4c3c4c !important;
+    font-size: 1.2rem;
+  }
+
+  .messages {
+    height: calc(100vh - 280px);
+    overflow-y: scroll;
+  }
+
+  .message__form {
+    position: fixed !important;
+    bottom: 1em;
+    margin-left: 320px !important;
+    left: 0;
+    right: 1em;
+    z-index: 200;
+  }
 `;

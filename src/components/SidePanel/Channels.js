@@ -1,13 +1,13 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { connect } from "react-redux";
 import { Menu, Icon, Modal, Button } from "semantic-ui-react";
 import { Form, Input } from "semantic-ui-react-form-validator";
 import { get } from "lodash";
 import firebase from "../../firebase";
+import * as channelActions from "../../redux/channel/actions";
 
 let Channels = (props) => {
-  const { currentUser } = props;
-
+  const { currentUser, currentChannel, setCurrentChannel } = props;
   const [channels, setChannels] = useState([]);
   const [showModal, toggleModal] = useState(false);
   const [inputState, setInputState] = useState({
@@ -16,7 +16,41 @@ let Channels = (props) => {
   });
 
   const channelsRef = firebase.database().ref("channels");
+
+  const addListeners = () => {
+    let loadedChannels = [];
+    channelsRef.on("child_added", (snap) => {
+      loadedChannels.push(snap.val());
+      setChannels([...loadedChannels]);
+    });
+  };
+
+  useEffect(
+    () => {
+      addListeners();
+      return () => channelsRef.off("child_added");
+    },
+    //eslint-disable-next-line
+    []
+  );
+
+  useEffect(
+    () => {
+      setNewChannel();
+    },
+    //eslint-disable-next-line
+    [channels]
+  );
+
   const { channelName, channelDetails } = inputState;
+
+  const setNewChannel = () => {
+    const newChannel = channels[channels.length - 1];
+
+    if (channels.length > 0) {
+      setCurrentChannel(newChannel);
+    }
+  };
 
   const handleInputChange = (e) => {
     setInputState({
@@ -58,6 +92,29 @@ let Channels = (props) => {
     addChannel();
   };
 
+  console.log("currentChannel", currentChannel);
+
+  const displayChannels = (channels) => {
+    return (
+      channels.length > 0 &&
+      channels.map((channel) => (
+        <Menu.Item
+          key={channel.id}
+          onClick={() => changeChannel(channel)}
+          name={channel.name}
+          style={{ opacity: 0.7 }}
+          active={channel.id === get(currentChannel, "id", null)}
+        >
+          # {channel.name}
+        </Menu.Item>
+      ))
+    );
+  };
+
+  const changeChannel = (channel) => {
+    setCurrentChannel(channel);
+  };
+
   return (
     <Fragment>
       <Menu.Menu style={{ paddingBottom: "2em" }}>
@@ -73,6 +130,7 @@ let Channels = (props) => {
             }}
           />
         </Menu.Item>
+        {displayChannels(channels)}
       </Menu.Menu>
 
       <Modal basic open={showModal} onClose={() => toggleModal(false)}>
@@ -119,8 +177,12 @@ let Channels = (props) => {
   );
 };
 
-Channels = connect((state) => ({
-  currentUser: get(state, "user.currentUser", null),
-}))(Channels);
+Channels = connect(
+  (state) => ({
+    currentUser: get(state, "user.currentUser", null),
+    currentChannel: get(state, "channel.currentChannel", null),
+  }),
+  channelActions
+)(Channels);
 
 export default Channels;
