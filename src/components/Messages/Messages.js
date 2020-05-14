@@ -1,10 +1,13 @@
-import React, { Fragment } from "react";
-import { Segment, Comment } from "semantic-ui-react";
+import React, { Fragment } from 'react';
+import { Segment, Comment } from 'semantic-ui-react';
 
-import MessagesHeader from "./MessagesHeader";
-import MessageForm from "./MessageForm";
+import MessagesHeader from './MessagesHeader';
+import MessageForm from './MessageForm';
+import firebase from '../../firebase';
 
 let Messages = () => {
+  const messagesRef = firebase.database().ref('messages');
+
   return (
     <Fragment>
       <MessagesHeader />
@@ -13,7 +16,7 @@ let Messages = () => {
         <Comment.Group className="messages">{/* {Messages} */}</Comment.Group>
       </Segment>
 
-      <MessageForm />
+      <MessageForm messagesRef={messagesRef} />
     </Fragment>
   );
 };
