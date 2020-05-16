@@ -55,4 +55,9 @@ const Wrapper = styled.div`
     right: 1em;
     z-index: 200;
   }
+
+  .message__self {
+    border-left: 2px solid orange;
+    padding-left: 8px;
+  }
 `;
