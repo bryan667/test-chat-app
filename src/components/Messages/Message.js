@@ -16,7 +16,7 @@ let Message = (props) => {
       <Comment.Avatar src={message.user.avatar} />
       <Comment.Content className={isOwnMessage(message, currentUser)}>
         <Comment.Author as="a">{message.user.name}</Comment.Author>
-        <Comment.Metadata>{timeFromNow(message.timstamp)}</Comment.Metadata>
+        <Comment.Metadata>{timeFromNow(message.timestamp)}</Comment.Metadata>
         <Comment.Text>{message.content}</Comment.Text>
       </Comment.Content>
     </Comment>
