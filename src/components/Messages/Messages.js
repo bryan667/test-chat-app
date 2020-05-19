@@ -57,7 +57,6 @@ let Messages = (props) => {
   return (
     <Fragment>
       <MessagesHeader />
-      {console.log("wtf", messages)}
 
       <Segment>
         <Comment.Group className="messages">

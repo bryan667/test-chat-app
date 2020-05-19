@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { get, isEmpty } from "lodash";
 import { Segment, Button, Input } from "semantic-ui-react";
 import { connect } from "react-redux";
+
+import FileModal from "./FileModal";
 import firebase from "../../firebase";
 
 let MessageForm = (props) => {
@@ -15,8 +17,10 @@ let MessageForm = (props) => {
   });
   const [loading, toggleLoading] = useState(false);
   const [error, setError] = useState([]);
+  const [showUploadModal, toggleUploadModal] = useState(false);
 
   const handleChange = (e) => {
+    setError([]);
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
@@ -47,10 +51,13 @@ let MessageForm = (props) => {
           setError(tempError.concat(err));
         });
     } else {
-      const tempError = [...error];
-      setError(tempError.concat({ message: "Add a message" }));
+      setError({ message: "Add a message" });
     }
   };
+
+  const hasError = get(error, "message", []);
+
+  console.log("hasError", error);
 
   return (
     <Segment className="message__form">
@@ -64,9 +71,7 @@ let MessageForm = (props) => {
         label={<Button icon={"add"}></Button>}
         labelPosition="left"
         placeholder="Write your message"
-        className={(error) =>
-          error.message.includes("message") ? "error" : ""
-        }
+        className={`${!isEmpty(hasError) ? "error" : ""}`}
       />
       <Button.Group icon widths="2">
         <Button
@@ -81,7 +86,15 @@ let MessageForm = (props) => {
           content="Upload Media"
           labelPosition="right"
           icon="cloud upload"
+          onClick={() => toggleUploadModal(!showUploadModal)}
         />
+
+        {showUploadModal && (
+          <FileModal
+            show={showUploadModal}
+            onHide={() => toggleUploadModal(false)}
+          />
+        )}
       </Button.Group>
     </Segment>
   );
