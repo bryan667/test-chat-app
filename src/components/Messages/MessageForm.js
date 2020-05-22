@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { get, isEmpty } from "lodash";
 import { Segment, Button, Input } from "semantic-ui-react";
 import { connect } from "react-redux";
@@ -8,6 +8,7 @@ import firebase from "../../firebase";
 
 let MessageForm = (props) => {
   const { messagesRef } = props;
+  const messageInputRef = useRef(null);
 
   //redux
   const { currentChannel, currentUser } = props;
@@ -43,12 +44,14 @@ let MessageForm = (props) => {
           toggleLoading(false);
           setInput({ ...input, message: "" });
           setError([]);
+          messageInputRef.current.focus();
         })
         .catch((err) => {
           toggleLoading(false);
           console.error(err);
           const tempError = [...error];
           setError(tempError.concat(err));
+          messageInputRef.current.focus();
         });
     } else {
       setError({ message: "Add a message" });
@@ -57,7 +60,11 @@ let MessageForm = (props) => {
 
   const hasError = get(error, "message", []);
 
-  console.log("hasError", error);
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
 
   return (
     <Segment className="message__form">
@@ -72,6 +79,8 @@ let MessageForm = (props) => {
         labelPosition="left"
         placeholder="Write your message"
         className={`${!isEmpty(hasError) ? "error" : ""}`}
+        onKeyDown={handleKeyDown}
+        ref={messageInputRef}
       />
       <Button.Group icon widths="2">
         <Button

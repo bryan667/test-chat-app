@@ -1,7 +1,6 @@
 import React from "react";
-import { Grid } from "semantic-ui-react";
 import styled from "styled-components";
-import ColorPanel from "./ColorPanel/ColorPanel";
+// import ColorPanel from "./ColorPanel/ColorPanel";
 import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
 import MetaPanel from "./MetaPanel/MetaPanel";
@@ -9,18 +8,14 @@ import MetaPanel from "./MetaPanel/MetaPanel";
 let App = () => {
   return (
     <Wrapper>
-      <Grid columns="equal" className="app">
-        <ColorPanel />
+      <div className="app">
+        {/* <ColorPanel /> */}
         <SidePanel />
 
-        <Grid.Column style={{ marginLeft: 320 }}>
-          <Messages />
-        </Grid.Column>
+        <Messages />
 
-        <Grid.Column width={4}>
-          <MetaPanel />
-        </Grid.Column>
-      </Grid>
+        <MetaPanel />
+      </div>
     </Wrapper>
   );
 };
@@ -31,15 +26,25 @@ const Wrapper = styled.div`
   .app {
     height: 100vh;
     background: #eee;
+    display: flex;
   }
 
   .ui.grid {
     margin: 0rem;
   }
 
+  .sidebar-menus {
+    @media only screen and (max-width: 700px) {
+      .ui.large.vertical.menu {
+        width: 10rem;
+      }
+    }
+  }
+
   .side-menu {
-    background: #4c3c4c !important;
-    font-size: 1.2rem;
+    background: #151515 !important;
+    font-size: 16px;
+    height: 100%;
   }
 
   .messages {
@@ -47,13 +52,23 @@ const Wrapper = styled.div`
     overflow-y: scroll;
   }
 
+  .messages-center {
+    position: relative;
+    min-width: 450px;
+    flex-grow: 1;
+  }
+
   .message__form {
-    position: fixed !important;
+    position: absolute !important;
     bottom: 1em;
-    margin-left: 320px !important;
     left: 0;
     right: 1em;
     z-index: 200;
+    width: 100%;
+  }
+
+  .ui.comments {
+    max-width: none;
   }
 
   .message__self {

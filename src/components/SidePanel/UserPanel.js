@@ -19,7 +19,7 @@ let UserPanel = (props) => {
   const displayName = get(currentUser, "displayName", null);
 
   return (
-    <Grid style={{ background: "#4c3c4c" }}>
+    <Grid className="user-panel">
       <Grid.Column>
         <Grid.Row style={{ padding: "1.2em", margin: 0 }}>
           <Header inverted floated="left" as="h2">

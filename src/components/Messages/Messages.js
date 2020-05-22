@@ -1,7 +1,7 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { get } from "lodash";
-import { Segment, Comment } from "semantic-ui-react";
+import { Segment, Comment, Loader } from "semantic-ui-react";
 
 import Message from "./Message";
 import MessagesHeader from "./MessagesHeader";
@@ -55,17 +55,21 @@ let Messages = (props) => {
   };
 
   return (
-    <Fragment>
+    <div className="messages-center">
       <MessagesHeader />
 
       <Segment>
         <Comment.Group className="messages">
-          {displayMessages(messages)}
+          {messagesLoading ? (
+            <Loader active inline="centered" />
+          ) : (
+            displayMessages(messages)
+          )}
         </Comment.Group>
       </Segment>
 
       <MessageForm messagesRef={messagesRef} />
-    </Fragment>
+    </div>
   );
 };
 

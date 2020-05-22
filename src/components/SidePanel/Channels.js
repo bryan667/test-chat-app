@@ -102,7 +102,6 @@ let Channels = (props) => {
           key={channel.id}
           onClick={() => changeChannel(channel)}
           name={channel.name}
-          style={{ opacity: 0.7 }}
           active={channel.id === get(currentChannel, "id", null)}
         >
           # {channel.name}

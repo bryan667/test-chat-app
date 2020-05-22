@@ -5,10 +5,12 @@ import Channels from "./Channels";
 
 let SidePanel = () => {
   return (
-    <Menu className="side-menu" size="large" inverted fixed="left" vertical>
-      <UserPanel />
-      <Channels />
-    </Menu>
+    <div className="sidebar-menus">
+      <Menu className="side-menu" size="large" inverted vertical>
+        <UserPanel />
+        <Channels />
+      </Menu>
+    </div>
   );
 };
 
