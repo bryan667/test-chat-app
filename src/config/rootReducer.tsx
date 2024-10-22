@@ -21,6 +21,5 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const getStore = () => {
   let store = createStore(persistedReducer, composeWithDevTools());
   let persistor = persistStore(store);
-
   return { store, persistor };
 };
