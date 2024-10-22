@@ -27,7 +27,7 @@ let Root = () => {
   const isLoading = useSelector((state) => get(state, "user.isLoading"));
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged((user) => {
+    firebase.auth().onAuthStateChanged((user: any) => {
       if (user) {
         dispatch(setUser(user));
         navigate("/");
