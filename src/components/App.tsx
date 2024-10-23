@@ -1,20 +1,16 @@
-import React from "react";
 import styled from "styled-components";
 // import ColorPanel from "./ColorPanel/ColorPanel";
 import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
-import MetaPanel from "./MetaPanel/MetaPanel";
+// import MetaPanel from "./MetaPanel/MetaPanel";
 
 let App = () => {
   return (
     <Wrapper>
       <div className="app">
-        {/* <ColorPanel /> */}
         <SidePanel />
-
         <Messages />
-
-        <MetaPanel />
+        {/* <MetaPanel /> */}
       </div>
     </Wrapper>
   );

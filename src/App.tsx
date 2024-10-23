@@ -3,7 +3,9 @@ import { get, isEmpty } from "lodash";
 import App from "./components/App";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
-import firebase from "./firebase";
+// import firebase from "./firebase";
+import {auth} from './firebase'
+import { onAuthStateChanged } from "firebase/auth";
 import Spinner from "./Spinner";
 
 import "semantic-ui-css/semantic.min.css";
@@ -27,7 +29,7 @@ let Root = () => {
   const isLoading = useSelector((state) => get(state, "user.isLoading"));
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged((user: any) => {
+    const unsubscribe = onAuthStateChanged(auth, (user: any) => {
       if (user) {
         dispatch(setUser(user));
         navigate("/");
@@ -38,6 +40,7 @@ let Root = () => {
         dispatch(clearUser());
       }
     });
+    return () => unsubscribe();
     //eslint-disable-next-line
   }, []);
 

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { get } from "lodash";
-import firebase from "../../firebase";
+import {database, auth} from "../../firebase";
+import {createUserWithEmailAndPassword, updateProfile, UserCredential} from 'firebase/auth'
+import { ref, set } from "firebase/database";
 import md5 from "md5";
 import {
   Grid,
@@ -28,16 +30,19 @@ let Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { username, email, password, passwordConfirmation } = inputState;
-  const usersRef = firebase.database().ref("users");
+  const usersRef = ref(database, "users");
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setInputState({
       ...inputState,
       [e.target.name]: e.target.value,
     });
   };
 
-  const isPasswordValid = ({ password, passwordConfirmation }) => {
+  const isPasswordValid = ({ password, passwordConfirmation }: {
+    password: string,
+    passwordConfirmation: string,
+  }) => {
     if (password.length < 6 || passwordConfirmation.length < 6) {
       setFieldError("Password should be at least 6 chars");
       return false;
@@ -58,31 +63,28 @@ let Register = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     if (isFormValid()) {
       setLoading(true);
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then((createdUser) => {
           const userEmail = get(createdUser, "user.email", "");
-          createdUser.user
-            .updateProfile({
+          return updateProfile(createdUser.user, {
               displayName: username,
               photoURL: `https://robohash.org/${md5(userEmail)}?set=set4`,
             })
             .then(() => {
-              saveUser(createdUser).then(() => {
+              return saveUser(createdUser).then(() => {
                 console.log("user saved");
                 setSuccessMessage(
                   `${userEmail} has been successfully registered. Redirecting you to login`
-                );
+                );                
+                setLoading(false);
                 setTimeout(() => {
                   navigate("/login");
                 }, 3000);
               });
-              setLoading(false);
             })
             .catch((err) => {
               setLoading(false);
@@ -101,8 +103,9 @@ let Register = () => {
     }
   };
 
-  const saveUser = (createdUser) => {
-    return usersRef.child(createdUser.user.uid).set({
+  const saveUser = (createdUser: UserCredential) => {
+    const userRef = ref(database, `users/${createdUser.user.uid}`);
+    return set(userRef, {
       name: createdUser.user.displayName,
       avatar: createdUser.user.photoURL,
     });

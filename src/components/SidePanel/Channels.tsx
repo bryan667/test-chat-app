@@ -1,13 +1,20 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { connect } from "react-redux";
+import { useState, useEffect, Fragment } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Menu, Icon, Modal, Button } from "semantic-ui-react";
 import { Form, Input } from "semantic-ui-react-form-validator";
 import { get } from "lodash";
-import firebase from "../../firebase";
-import * as channelActions from "../../redux/channel/actions";
+import { database } from "../../firebase";
+import { off, onValue, push, ref, set } from "firebase/database";
+import {setCurrentChannel} from '../../redux/channel'
 
-let Channels = (props) => {
-  const { currentUser, currentChannel, setCurrentChannel } = props;
+let Channels = () => {
+  const dispatch = useDispatch()
+  const { currentUser, currentChannel }: any = useSelector((state) => {
+    return {
+      currentUser: get(state, "user.currentUser"),
+      currentChannel: get(state, "channel.currentChannel"),
+    }
+  })
   const [channels, setChannels] = useState([]);
   const [showModal, toggleModal] = useState(false);
   const [inputState, setInputState] = useState({
@@ -15,24 +22,21 @@ let Channels = (props) => {
     channelDetails: "",
   });
 
-  const channelsRef = firebase.database().ref("channels");
+  const channelsRef = ref(database, "channels");
 
-  const addListeners = () => {
-    let loadedChannels = [];
-    channelsRef.on("child_added", (snap) => {
-      loadedChannels.push(snap.val());
-      setChannels([...loadedChannels]);
+  useEffect(() => {
+    // Set up the listener
+    const unsubscribe = onValue(channelsRef, (snapshot) => {
+      const loadedChannels: any = [];
+      snapshot.forEach((childSnapshot) => {
+        loadedChannels.push(childSnapshot.val());
+      });
+      setChannels(loadedChannels);
     });
-  };
 
-  useEffect(
-    () => {
-      addListeners();
-      return () => channelsRef.off("child_added");
-    },
-    //eslint-disable-next-line
-    []
-  );
+    // Cleanup function to remove the listener when the component unmounts
+    return () => off(channelsRef, 'value', unsubscribe);
+  }, []);
 
   useEffect(
     () => {
@@ -48,11 +52,11 @@ let Channels = (props) => {
     const newChannel = channels[channels.length - 1];
 
     if (channels.length > 0) {
-      setCurrentChannel(newChannel);
+      dispatch(setCurrentChannel(newChannel));
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     setInputState({
       ...inputState,
       [e.target.name]: e.target.value,
@@ -60,58 +64,43 @@ let Channels = (props) => {
   };
 
   const addChannel = () => {
-    const key = channelsRef.push().key;
-    const newChannel = {
-      id: key,
-      name: channelName,
-      details: channelDetails,
-      createdBy: {
-        name: currentUser.displayName,
-        avatar: currentUser.photoURL,
-      },
-    };
-
-    channelsRef
-      .child(key)
-      .update(newChannel)
-      .then(() => {
-        setInputState({
-          channelName: "",
-          channelDetails: "",
+    if (currentUser) {
+      const newChannelRef = push(ref(database, 'channels'))
+      const newChannel = {
+        id: newChannelRef.key,
+        name: channelName,
+        details: channelDetails,
+        createdBy: {
+          name: currentUser.displayName,
+          avatar: currentUser.photoURL,
+        },
+      };
+  
+      set(newChannelRef, newChannel)
+        .then(() => {
+          setInputState({
+            channelName: "",
+            channelDetails: "",
+          });
+          toggleModal(false);
+          console.log("channel added");
+        })
+        .catch((err) => {
+          console.error(err);
         });
-        toggleModal(false);
-        console.log("channel added");
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    }
+
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     addChannel();
   };
 
   console.log("currentChannel", currentChannel);
 
-  const displayChannels = (channels) => {
-    return (
-      channels.length > 0 &&
-      channels.map((channel) => (
-        <Menu.Item
-          key={channel.id}
-          onClick={() => changeChannel(channel)}
-          name={channel.name}
-          active={channel.id === get(currentChannel, "id", null)}
-        >
-          # {channel.name}
-        </Menu.Item>
-      ))
-    );
-  };
-
-  const changeChannel = (channel) => {
-    setCurrentChannel(channel);
+  const changeChannel = (channel: any) => {
+    dispatch(setCurrentChannel(channel))
   };
 
   return (
@@ -129,7 +118,16 @@ let Channels = (props) => {
             }}
           />
         </Menu.Item>
-        {displayChannels(channels)}
+        {channels.map((channel: any) => (
+          <Menu.Item
+            key={channel.id}
+            onClick={() => changeChannel(channel)}
+            name={channel.name}
+            active={channel.id === get(currentChannel, "id", null)}
+          >
+            # {channel.name}
+          </Menu.Item>
+        ))}
       </Menu.Menu>
 
       <Modal basic open={showModal} onClose={() => toggleModal(false)}>
@@ -175,13 +173,5 @@ let Channels = (props) => {
     </Fragment>
   );
 };
-
-Channels = connect(
-  (state) => ({
-    currentUser: get(state, "user.currentUser", null),
-    currentChannel: get(state, "channel.currentChannel", null),
-  }),
-  channelActions
-)(Channels);
 
 export default Channels;

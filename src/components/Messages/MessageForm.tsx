@@ -1,17 +1,19 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { get, isEmpty } from "lodash";
 import { Segment, Button, Input } from "semantic-ui-react";
-import { connect } from "react-redux";
-
+import { useSelector } from "react-redux";
 import FileModal from "./FileModal";
-import firebase from "../../firebase";
+import { push, ref, set } from "firebase/database";
+import { database } from "../../firebase";
 
-let MessageForm = (props) => {
-  const { messagesRef } = props;
-  const messageInputRef = useRef(null);
-
-  //redux
-  const { currentChannel, currentUser } = props;
+let MessageForm = ({messagesRef}: any) => {
+  const messageInputRef:any = useRef();
+  const { currentUser, currentChannel }: any = useSelector((state) => {
+    return {
+      currentUser: get(state, "user.currentUser"),
+      currentChannel: get(state, "channel.currentChannel"),
+    }
+  })
 
   const [input, setInput] = useState({
     message: "",
@@ -20,7 +22,7 @@ let MessageForm = (props) => {
   const [error, setError] = useState([]);
   const [showUploadModal, toggleUploadModal] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setError([]);
     setInput({ ...input, [e.target.name]: e.target.value });
   };
@@ -28,11 +30,10 @@ let MessageForm = (props) => {
   const sendMessage = () => {
     if (!isEmpty(input.message)) {
       toggleLoading(true);
-      messagesRef
-        .child(currentChannel.id)
-        .push()
-        .set({
-          timestamp: firebase.database.ServerValue.TIMESTAMP,
+      const messageRef = push(ref(database, `messages/${currentChannel.id}`))
+
+      set(messageRef, {
+          timestamp: Date.now(),
           content: input.message,
           user: {
             id: currentUser.uid,
@@ -60,7 +61,7 @@ let MessageForm = (props) => {
 
   const hasError = get(error, "message", []);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: any) => {
     if (e.key === "Enter") {
       sendMessage();
     }
@@ -108,10 +109,5 @@ let MessageForm = (props) => {
     </Segment>
   );
 };
-
-MessageForm = connect((state) => ({
-  currentUser: get(state, "user.currentUser"),
-  currentChannel: get(state, "channel.currentChannel"),
-}))(MessageForm);
 
 export default MessageForm;

@@ -1,17 +1,15 @@
-import React from "react";
 import { get } from "lodash";
-import firebase from "../../firebase";
-import { connect } from "react-redux";
+import { auth } from "../../firebase";
+import { useSelector } from "react-redux";
 import { Grid, Header, Icon, Dropdown, Image } from "semantic-ui-react";
-import * as userActions from "../../redux/user/actions";
+import { signOut } from "firebase/auth";
 
-let UserPanel = (props) => {
-  const { currentUser } = props;
+let UserPanel = () => {
+
+  const currentUser = useSelector((state) => get(state, "user.currentUser"));
 
   const handleSignOut = () => {
-    firebase
-      .auth()
-      .signOut()
+      signOut(auth)
       .then(() => console.log("signed out!"));
   };
 
@@ -53,12 +51,5 @@ let UserPanel = (props) => {
     </Grid>
   );
 };
-
-UserPanel = connect(
-  (state) => ({
-    currentUser: get(state, "user.currentUser", null),
-  }),
-  userActions
-)(UserPanel);
 
 export default UserPanel;

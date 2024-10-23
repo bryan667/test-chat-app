@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { get } from "lodash";
-import firebase from "../../firebase";
+import { auth } from "../../firebase";
 import {
   Grid,
   Segment,
@@ -10,6 +10,7 @@ import {
   Icon,
   Loader,
 } from "semantic-ui-react";
+import {signInWithEmailAndPassword} from 'firebase/auth'
 import { Form, Input } from "semantic-ui-react-form-validator";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -25,19 +26,17 @@ let Login = () => {
 
   const { email, password } = inputState;
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     setInputState({
       ...inputState,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     setLoading(true);
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then((signedInUser) => {
         console.log("signedInUser", signedInUser);
       })
