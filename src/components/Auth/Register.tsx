@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { get, isEmpty } from "lodash";
+import { get } from "lodash";
 import {database, auth} from "../../firebase";
 import {createUserWithEmailAndPassword, updateProfile, UserCredential} from 'firebase/auth'
 import { ref, set } from "firebase/database";
@@ -14,12 +14,9 @@ import {
   Loader,
 } from "semantic-ui-react";
 import { Form, Input } from "semantic-ui-react-form-validator";
-import { Link, useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { Link } from "react-router-dom";
 
 let Register = () => {
-  const navigate = useNavigate();
-
   const [inputState, setInputState] = useState({
     username: "",
     email: "",

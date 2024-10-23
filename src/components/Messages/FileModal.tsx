@@ -1,6 +1,6 @@
 import { Modal, Input, Button, Icon } from "semantic-ui-react";
 
-let FileModal = (props) => {
+let FileModal = (props: any) => {
   const { show, onHide } = props;
 
   return (

@@ -1,4 +1,3 @@
-import React from "react";
 import { Sidebar, Menu, Divider, Button } from "semantic-ui-react";
 
 let ColorPanel = () => {

@@ -14,7 +14,6 @@ import {
 import {signInWithEmailAndPassword} from 'firebase/auth'
 import { Form, Input } from "semantic-ui-react-form-validator";
 import { Link, useParams } from "react-router-dom";
-import styled from "styled-components";
 
 let Login = () => {
   const [inputState, setInputState] = useState({
