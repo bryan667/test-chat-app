@@ -1,4 +1,3 @@
-import React from "react";
 import { Modal, Input, Button, Icon } from "semantic-ui-react";
 
 let FileModal = (props) => {

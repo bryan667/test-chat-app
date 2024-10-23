@@ -1,11 +1,10 @@
 import { useEffect, Fragment } from "react";
-import { get, isEmpty } from "lodash";
+import { get } from "lodash";
 import App from "./components/App";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
-// import firebase from "./firebase";
 import {auth} from './firebase'
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import Spinner from "./Spinner";
 
 import "semantic-ui-css/semantic.min.css";
@@ -15,7 +14,6 @@ import {
   Route,
   useNavigate
 } from "react-router-dom";
-
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { getStore } from "./config/rootReducer";
@@ -30,14 +28,18 @@ let Root = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user: any) => {
-      if (user) {
+      if (user && user.displayName) {
         dispatch(setUser(user));
         navigate("/");
-      } else if (isEmpty(user) && window.location.pathname === "/") {
+      } else if (user && !user.displayName) {
+        const redirect = Math.floor(100 + Math.random() * 900);
+        dispatch(clearUser());
+        signOut(auth)
+        navigate(`/login/${redirect}`);        
+      } else {        
+        dispatch(clearUser());
+        signOut(auth)
         navigate("/login");
-        dispatch(clearUser());
-      } else {
-        dispatch(clearUser());
       }
     });
     return () => unsubscribe();
@@ -51,7 +53,7 @@ let Root = () => {
       ) : (
         <Routes>
           <Route path="/" element={<App />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login/:redirected?" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
       )}

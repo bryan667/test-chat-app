@@ -1,15 +1,14 @@
-import React from "react";
 import moment from "moment";
 import { Comment } from "semantic-ui-react";
 
-let Message = (props) => {
+let Message = (props: any) => {
   const { message, currentUser } = props;
 
-  const isOwnMessage = (message, currentUser) => {
+  const isOwnMessage = (message: any, currentUser: any) => {
     return message.user.id === currentUser.uid ? "message__self" : "";
   };
 
-  const timeFromNow = (timestamp) => moment(timestamp).fromNow();
+  const timeFromNow = (timestamp: string) => moment(timestamp).fromNow();
 
   return (
     <Comment>

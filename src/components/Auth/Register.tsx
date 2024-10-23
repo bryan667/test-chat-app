@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { get } from "lodash";
+import { get, isEmpty } from "lodash";
 import {database, auth} from "../../firebase";
 import {createUserWithEmailAndPassword, updateProfile, UserCredential} from 'firebase/auth'
 import { ref, set } from "firebase/database";
@@ -30,7 +30,6 @@ let Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { username, email, password, passwordConfirmation } = inputState;
-  const usersRef = ref(database, "users");
 
   const handleChange = (e: any) => {
     setInputState({
@@ -79,18 +78,15 @@ let Register = () => {
                 console.log("user saved");
                 setSuccessMessage(
                   `${userEmail} has been successfully registered. Redirecting you to login`
-                );                
+                );
                 setLoading(false);
-                setTimeout(() => {
-                  navigate("/login");
-                }, 3000);
-              });
+              });    
             })
             .catch((err) => {
-              setLoading(false);
               setFieldError(
                 get(err, "message", "network error, please try again later")
               );
+              setLoading(false);
             });
         })
         .catch((err) => {
@@ -112,7 +108,7 @@ let Register = () => {
   };
 
   return (
-    <Wrapper>
+    <>
       <Grid textAlign="center" verticalAlign="middle" className="register">
         <Grid.Column style={{ maxWidth: 450 }}>
           <Header as="h1" icon color="orange" textAlign="center">
@@ -190,16 +186,8 @@ let Register = () => {
           </Form>
         </Grid.Column>
       </Grid>
-    </Wrapper>
+    </>
   );
 };
 
 export default Register;
-
-const Wrapper = styled.div`
-  .register {
-    height: 100vh;
-    background: #eee;
-    padding: 1em;
-  }
-`;

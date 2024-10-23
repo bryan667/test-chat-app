@@ -1,24 +1,11 @@
-import styled from "styled-components";
 // import ColorPanel from "./ColorPanel/ColorPanel";
 import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
 // import MetaPanel from "./MetaPanel/MetaPanel";
+import styled from "styled-components";
 
 let App = () => {
-  return (
-    <Wrapper>
-      <div className="app">
-        <SidePanel />
-        <Messages />
-        {/* <MetaPanel /> */}
-      </div>
-    </Wrapper>
-  );
-};
-
-export default App;
-
-const Wrapper = styled.div`
+  const Wrapper = styled.div`
   .app {
     height: 100vh;
     background: #eee;
@@ -72,3 +59,18 @@ const Wrapper = styled.div`
     padding-left: 8px;
   }
 `;
+
+  return (
+    <Wrapper>
+      <div className="app">
+        <SidePanel />
+        <Messages />
+        {/* <MetaPanel /> */}
+      </div>
+    </Wrapper>
+  );
+};
+
+export default App;
+
+

@@ -1,10 +1,10 @@
 import { useState, useEffect, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Menu, Icon, Modal, Button } from "semantic-ui-react";
+import { Menu, Icon, Modal, Button, Container, Header } from "semantic-ui-react";
 import { Form, Input } from "semantic-ui-react-form-validator";
-import { get } from "lodash";
+import { get, isEmpty } from "lodash";
 import { database } from "../../firebase";
-import { off, onValue, push, ref, set } from "firebase/database";
+import { off, onValue, push, ref, remove, set } from "firebase/database";
 import {setCurrentChannel} from '../../redux/channel'
 
 let Channels = () => {
@@ -17,6 +17,7 @@ let Channels = () => {
   })
   const [channels, setChannels] = useState([]);
   const [showModal, toggleModal] = useState(false);
+  const [showRemoveChannelModal, toggleRemoveChannelModal]:any = useState(null);
   const [inputState, setInputState] = useState({
     channelName: "",
     channelDetails: "",
@@ -33,8 +34,6 @@ let Channels = () => {
       });
       setChannels(loadedChannels);
     });
-
-    // Cleanup function to remove the listener when the component unmounts
     return () => off(channelsRef, 'value', unsubscribe);
   }, []);
 
@@ -50,7 +49,6 @@ let Channels = () => {
 
   const setNewChannel = () => {
     const newChannel = channels[channels.length - 1];
-
     if (channels.length > 0) {
       dispatch(setCurrentChannel(newChannel));
     }
@@ -89,7 +87,6 @@ let Channels = () => {
           console.error(err);
         });
     }
-
   };
 
   const handleSubmit = (e: any) => {
@@ -103,6 +100,21 @@ let Channels = () => {
     dispatch(setCurrentChannel(channel))
   };
 
+  const onRemoveChannel = (channelId: string)=> {
+    const channelRef = ref(database, `channels/${channelId}`);
+    toggleRemoveChannelModal(null)
+    remove(channelRef)
+    .then(() => {
+      if (channelId === currentChannel.id && !isEmpty(channels)) {
+        dispatch(setCurrentChannel(null))
+      }
+      console.log("Channel removed successfully");
+    })
+    .catch((error) => {
+      console.error("Error removing channel:", error);
+    });
+  }
+
   return (
     <Fragment>
       <Menu.Menu style={{ paddingBottom: "2em" }}>
@@ -113,20 +125,27 @@ let Channels = () => {
           &nbsp; ({channels.length})
           <Icon
             name="add"
+            style={{
+              cursor: 'pointer'
+            }}
             onClick={() => {
               toggleModal(true);
             }}
           />
         </Menu.Item>
         {channels.map((channel: any) => (
-          <Menu.Item
-            key={channel.id}
-            onClick={() => changeChannel(channel)}
-            name={channel.name}
-            active={channel.id === get(currentChannel, "id", null)}
-          >
-            # {channel.name}
-          </Menu.Item>
+            <Menu.Item
+              key={channel.id}
+              onClick={() => changeChannel(channel)}
+              name={channel.name}
+              active={channel.id === get(currentChannel, "id")}
+            >
+              # {channel.name}
+              <Icon
+                name="x"
+                onClick={() => toggleRemoveChannelModal(channel)}
+              />
+            </Menu.Item>
         ))}
       </Menu.Menu>
 
@@ -168,6 +187,24 @@ let Channels = () => {
               </Button>
             </div>
           </Form>
+        </Modal.Content>
+      </Modal>
+
+      <Modal basic open={!isEmpty(showRemoveChannelModal)} onClose={() => toggleRemoveChannelModal(null)}>
+        <Modal.Content>
+        <Container textAlign="center">
+            <Header as="h2" style={{color: 'white'}}>{`Remove channel - ${showRemoveChannelModal?.name || ""}?`}</Header>
+            <Button color="green" inverted onClick={() => {
+              if (showRemoveChannelModal) {
+                onRemoveChannel(showRemoveChannelModal.id)
+              }
+            }}>
+              <Icon name="checkmark" /> Yes
+            </Button>
+            <Button color="red" inverted onClick={() => toggleRemoveChannelModal(null)}>
+              <Icon name="remove" /> Cancel
+            </Button>
+          </Container>
         </Modal.Content>
       </Modal>
     </Fragment>

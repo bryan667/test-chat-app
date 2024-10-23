@@ -6,7 +6,7 @@ import FileModal from "./FileModal";
 import { push, ref, set } from "firebase/database";
 import { database } from "../../firebase";
 
-let MessageForm = ({messagesRef}: any) => {
+let MessageForm = () => {
   const messageInputRef:any = useRef();
   const { currentUser, currentChannel }: any = useSelector((state) => {
     return {
@@ -54,8 +54,6 @@ let MessageForm = ({messagesRef}: any) => {
           setError(tempError.concat(err));
           messageInputRef.current.focus();
         });
-    } else {
-      setError({ message: "Add a message" });
     }
   };
 

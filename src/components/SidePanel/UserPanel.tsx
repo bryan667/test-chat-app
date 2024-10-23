@@ -5,14 +5,11 @@ import { Grid, Header, Icon, Dropdown, Image } from "semantic-ui-react";
 import { signOut } from "firebase/auth";
 
 let UserPanel = () => {
-
   const currentUser = useSelector((state) => get(state, "user.currentUser"));
-
   const handleSignOut = () => {
       signOut(auth)
       .then(() => console.log("signed out!"));
   };
-
   const photoURL = get(currentUser, "photoURL", null);
   const displayName = get(currentUser, "displayName", null);
 

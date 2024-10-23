@@ -9,10 +9,11 @@ import {
   Message,
   Icon,
   Loader,
+  Container,
 } from "semantic-ui-react";
 import {signInWithEmailAndPassword} from 'firebase/auth'
 import { Form, Input } from "semantic-ui-react-form-validator";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 
 let Login = () => {
@@ -21,6 +22,7 @@ let Login = () => {
     password: "",
   });
 
+  const {redirected} = useParams()
   const [fieldError, setFieldError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -50,9 +52,21 @@ let Login = () => {
   };
 
   return (
-    <Wrapper>
+    <>
       <Grid textAlign="center" verticalAlign="middle" className="register">
         <Grid.Column style={{ maxWidth: 450 }}>
+          {redirected && 
+            <Container textAlign="center" style={{ marginTop: '20%' }}>
+              <Message
+                color="yellow"
+                style={{ display: 'inline-block' }}
+              >
+                <Message.Header>Redirected</Message.Header>
+                <p>Please login with your credentials</p>
+              </Message>
+            </Container>
+          }
+
           <Header as="h1" icon color="violet" textAlign="center">
             <Icon name="puzzle piece" color="violet" />
             Login to Chat
@@ -100,16 +114,8 @@ let Login = () => {
           </Form>
         </Grid.Column>
       </Grid>
-    </Wrapper>
+    </>
   );
 };
 
 export default Login;
-
-const Wrapper = styled.div`
-  .register {
-    height: 100vh;
-    background: #eee;
-    padding: 1em;
-  }
-`;

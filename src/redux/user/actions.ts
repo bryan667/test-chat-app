@@ -1,4 +1,4 @@
-import { SET_USER, CLEAR_USER } from "./types";
+import { SET_USER, CLEAR_USER, MANUAL_AUTH_STATE_CHANGE } from "./types";
 
 export const setUser = (user: any) => {
   return {
@@ -12,5 +12,14 @@ export const setUser = (user: any) => {
 export const clearUser = () => {
   return {
     type: CLEAR_USER,
+  };
+};
+
+export const manualAuthStateChange  = (user: any) => {
+  return {
+    type: MANUAL_AUTH_STATE_CHANGE,
+    payload: {
+      currentUser: user,
+    },
   };
 };
